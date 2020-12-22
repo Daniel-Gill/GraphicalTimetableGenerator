@@ -91,16 +91,16 @@ public class GraphGenerator extends ApplicationFrame {
     private static XYDataset createDataset() {
 
         TimeSeries s1 = new TimeSeries("2L63");
-        s1.add(new Minute(32, 11, 1, 1, 1900), 0); //Leeds
-        s1.add(new Minute(41, 11, 1, 1, 1900), 20); //Woodlesford
-        s1.add(new Minute(49, 11, 1, 1, 1900), 40); //Castleford
-        s1.add(new Minute(52, 11, 1, 1, 1900), 40); //Castleford
-        s1.add(new Minute(57, 11, 1, 1, 1900), 60); //Normanton
-        s1.add(new Minute(2, 12, 1, 1, 1900), 80); //Kirkgate
-        s1.add(new Minute(3, 12, 1, 1, 1900), 80); //Kirkgate
-        s1.add(new Minute(14, 12, 1, 1, 1900), 100); //Darton
-        s1.add(new Minute(21, 12, 1, 1, 1900), 120); //Barnsley
-        s1.add(new Minute(22, 12, 1, 1, 1900), 120); //Barnsley
+        s1.add(new Minute(32, 11, 1, 1, 1900), 0);
+        s1.add(new Minute(41, 11, 1, 1, 1900), 20);
+        s1.add(new Minute(49, 11, 1, 1, 1900), 40);
+        s1.add(new Minute(52, 11, 1, 1, 1900), 40);
+        s1.add(new Minute(57, 11, 1, 1, 1900), 60);
+        s1.add(new Minute(2, 12, 1, 1, 1900), 80);
+        s1.add(new Minute(3, 12, 1, 1, 1900), 80);
+        s1.add(new Minute(14, 12, 1, 1, 1900), 100);
+        s1.add(new Minute(21, 12, 1, 1, 1900), 120);
+        s1.add(new Minute(22, 12, 1, 1, 1900), 120);
         s1.add(new Minute(27, 12, 1, 1, 1900), 140);
         s1.add(new Minute(31, 12, 1, 1, 1900), 160);
         s1.add(new Minute(36, 12, 1, 1, 1900), 180);
