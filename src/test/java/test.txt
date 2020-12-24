@@ -1,0 +1,17 @@
+STATIONS
+3
+Alpha
+Beta Test
+Gamma
+;
+SERVICES
+2
+1A00
+Alpha d06:00
+Beta Test a06:05 d06:06
+Gamma a06:10
+;
+2B00
+Alpha d06:05
+Gamma a06:12
+;

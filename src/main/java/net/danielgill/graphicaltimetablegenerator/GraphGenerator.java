@@ -1,7 +1,9 @@
 package net.danielgill.graphicaltimetablegenerator;
 
 import java.awt.Color;
+import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 import javax.swing.JPanel;
 
@@ -16,6 +18,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.ApplicationFrame;
 import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.ArrayUtils;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -25,24 +28,30 @@ public class GraphGenerator extends ApplicationFrame {
 
     private static final long serialVersionUID = 1L;
 
-    public GraphGenerator(String title) {
+    public GraphGenerator(String title, File tbfile) {
         super(title);
-        ChartPanel chartPanel = (ChartPanel) createDemoPanel();
+        
+        FileParse fp = new FileParse(tbfile);
+        System.out.println(Arrays.toString(fp.getStations()));
+        System.out.println(Arrays.toString(fp.getServices()));
+        System.out.println(Arrays.toString(fp.serviceParse(fp.getServices()[0])));
+        
+        ChartPanel chartPanel = (ChartPanel) createDemoPanel(fp);
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
         setContentPane(chartPanel);
     }
 
-    private static JFreeChart createChart(XYDataset dataset) {
+    private static JFreeChart createChart(XYDataset dataset, FileParse fp) {
 
-        JFreeChart chart = ChartFactory.createTimeSeriesChart("Timetable", "Time", "Station", dataset);
+        JFreeChart chart = ChartFactory.createTimeSeriesChart("Timetable", "Time", "Stations", dataset);
 
         chart.setBackgroundPaint(Color.WHITE);
         
-        String[] stations = {"Leeds", "Woodlesford", "Castleford", "Normanton", "Wakefield Kirkgate", "Darton", "Barnsley", "Wombwell", "Elsecar", "Chapeltown", "Meadowhall Interchange", "Sheffield"};
+        String[] stations = fp.getStations();
         
-        String[] labels = new String[221];
         final int gap = 20;
         int count = gap;
+        String[] labels = new String[stations.length * gap - (gap - 1)];
         for(int i = 0; i < labels.length; i++) {
             if(count == gap) {
                 labels[i] = stations[i/gap];
@@ -55,8 +64,8 @@ public class GraphGenerator extends ApplicationFrame {
         labels[labels.length - 1] = stations[stations.length - 1];
         
         SymbolAxis rangeAxis = new SymbolAxis("", labels);
-        rangeAxis.setTickUnit(new NumberTickUnit(20));
-        rangeAxis.setRange(0,225);
+        rangeAxis.setTickUnit(new NumberTickUnit(gap));
+        rangeAxis.setRange(0,stations.length * gap + 2.5);
 
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setRangeAxis(rangeAxis);
@@ -83,49 +92,40 @@ public class GraphGenerator extends ApplicationFrame {
 
     }
 
-    private static XYDataset createDataset() {
-
-        TimeSeries s1 = new TimeSeries("2L63");
-        s1.add(new Minute(32, 11, 1, 1, 1900), 0);
-        s1.add(new Minute(41, 11, 1, 1, 1900), 20);
-        s1.add(new Minute(49, 11, 1, 1, 1900), 40);
-        s1.add(new Minute(52, 11, 1, 1, 1900), 40);
-        s1.add(new Minute(57, 11, 1, 1, 1900), 60);
-        s1.add(new Minute(2, 12, 1, 1, 1900), 80);
-        s1.add(new Minute(3, 12, 1, 1, 1900), 80);
-        s1.add(new Minute(14, 12, 1, 1, 1900), 100);
-        s1.add(new Minute(21, 12, 1, 1, 1900), 120);
-        s1.add(new Minute(22, 12, 1, 1, 1900), 120);
-        s1.add(new Minute(27, 12, 1, 1, 1900), 140);
-        s1.add(new Minute(31, 12, 1, 1, 1900), 160);
-        s1.add(new Minute(36, 12, 1, 1, 1900), 180);
-        s1.add(new Minute(42, 12, 1, 1, 1900), 200);
-        s1.add(new Minute(43, 12, 1, 1, 1900), 200);
-        s1.add(new Minute(51, 12, 1, 1, 1900), 220);
+    private static XYDataset createDataset(FileParse fp) {
+        String[] services = fp.getServices();
+        String[] stations = fp.getStations();
         
-        TimeSeries s2 = new TimeSeries("1Y17");
-        s2.add(new Minute(9, 12, 1, 1, 1900), 0);
-        s2.add(new Minute(25, 12, 1, 1, 1900), 80);
-        s2.add(new Minute(26, 12, 1, 1, 1900), 80);
-        s2.add(new Minute(41, 12, 1, 1, 1900), 120);
-        s2.add(new Minute(42, 12, 1, 1, 1900), 120);
-        s2.add(new Minute(56, 12, 1, 1, 1900), 200);
-        s2.add(new Minute(57, 12, 1, 1, 1900), 200);
-        s2.add(new Minute(04, 13, 1, 1, 1900), 220);
-
         TimeSeriesCollection dataset = new TimeSeriesCollection();
-        dataset.addSeries(s1);
-        dataset.addSeries(s2);
-
+        
+        for(int i = 0; i < services.length; i++) {
+            String[] serviceInfo = fp.serviceParse(services[i]);
+            TimeSeries tempTS = new TimeSeries(serviceInfo[0]);
+            for(int j = 1; j < serviceInfo.length; j++) {
+                String[] stationSplit = serviceInfo[j].split("-");
+                int stationValue = findIndexOfStringArray(stations, stationSplit[0]) * 20;
+                tempTS.add(new Minute(Integer.parseInt(stationSplit[1].substring(4, 6)), Integer.parseInt(stationSplit[1].substring(1, 3)), 1, 1, 1900), stationValue);
+            }
+            dataset.addSeries(tempTS);
+        }
+        
         return dataset;
-
     }
     
-    public static JPanel createDemoPanel() {
-        JFreeChart chart = createChart(createDataset());
+    public static JPanel createDemoPanel(FileParse fp) {
+        JFreeChart chart = createChart(createDataset(fp), fp);
         ChartPanel panel = new ChartPanel(chart, false);
         panel.setFillZoomRectangle(true);
         panel.setMouseWheelEnabled(true);
         return panel;
+    }
+    
+    public static int findIndexOfStringArray(String[] array, String item) {
+        for(int i = 0; i < array.length; i++) {
+            if(array[i].equals(item)) {
+                return i;
+            }
+        }
+        return 0;
     }
 }
