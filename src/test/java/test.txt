@@ -1,17 +1,21 @@
 STATIONS
-3
-Alpha
-Beta Test
-Gamma
+6
+Sheffield
+Meadowhall Interchange
+Chapeltown
+Elsecar
+Wombwell
+Barnsley
 ;
 SERVICES
 2
 1A00
-Alpha d06:00
-Beta Test a06:05 d06:06
-Gamma a06:10
+Sheffield d06:00
+Meadowhall Interchange a06:05 d06:06
+Barnsley a06:21
 ;
 2B00
-Alpha d06:05
-Gamma a06:12
+Sheffield d06:05
+Meadowhall Interchange a06:10 d06:11
+Chapeltown a06:16
 ;
