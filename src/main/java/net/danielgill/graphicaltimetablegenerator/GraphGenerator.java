@@ -69,7 +69,7 @@ public class GraphGenerator extends ApplicationFrame {
 
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setRangeAxis(rangeAxis);
-        plot.setBackgroundPaint(Color.LIGHT_GRAY);
+        plot.setBackgroundPaint(Color.WHITE);
         plot.setDomainGridlinePaint(Color.WHITE);
         plot.setRangeGridlinePaint(Color.WHITE);
         plot.setAxisOffset(new RectangleInsets(10.0, 10.0, 10.0, 10.0));
