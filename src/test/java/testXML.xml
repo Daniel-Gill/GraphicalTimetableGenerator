@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timetable>
+    <station name="Alpha">
+        <name>Alpha</name>
+    </station>
+    <station name="Beta">
+        <name>Beta</name>
+    </station>
+    <station name="Gamma">
+        <name>Gamma</name>
+    </station>
+    <service id="1A00">
+        <stop>
+            <station>Alpha</station>
+            <deptime>08:00</deptime>
+        </stop>
+        <stop>
+            <station>Beta</station>
+            <arrtime>08:04</arrtime>
+            <deptime>08:05</deptime>
+        </stop>
+        <stop>
+            <station>Gamma</station>
+            <arrtime>08:11</arrtime>
+        </stop>
+    </service>
+    <service id="2B00">
+        <stop>
+            <station>Alpha</station>
+            <deptime>08:05</deptime>
+        </stop>
+        <stop>
+            <station>Gamma</station>
+            <arrtime>08:15</arrtime>
+        </stop>
+    </service>
+</timetable>

@@ -1,9 +1,18 @@
 package net.danielgill.graphicaltimetablegenerator;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JPanel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -16,18 +25,24 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.ApplicationFrame;
 import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.ArrayUtils;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class GraphGenerator extends ApplicationFrame {
 
     private static final long serialVersionUID = 1L;
 
-    public GraphGenerator(String title) {
+    public GraphGenerator(String title, File xmlfile) {
         super(title);
-        ChartPanel chartPanel = (ChartPanel) createDemoPanel();
+        ChartPanel chartPanel = (ChartPanel) createDemoPanel(xmlfile);
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
         setContentPane(chartPanel);
     }
@@ -83,49 +98,111 @@ public class GraphGenerator extends ApplicationFrame {
 
     }
 
-    private static XYDataset createDataset() {
-
-        TimeSeries s1 = new TimeSeries("2L63");
-        s1.add(new Minute(32, 11, 1, 1, 1900), 0);
-        s1.add(new Minute(41, 11, 1, 1, 1900), 20);
-        s1.add(new Minute(49, 11, 1, 1, 1900), 40);
-        s1.add(new Minute(52, 11, 1, 1, 1900), 40);
-        s1.add(new Minute(57, 11, 1, 1, 1900), 60);
-        s1.add(new Minute(2, 12, 1, 1, 1900), 80);
-        s1.add(new Minute(3, 12, 1, 1, 1900), 80);
-        s1.add(new Minute(14, 12, 1, 1, 1900), 100);
-        s1.add(new Minute(21, 12, 1, 1, 1900), 120);
-        s1.add(new Minute(22, 12, 1, 1, 1900), 120);
-        s1.add(new Minute(27, 12, 1, 1, 1900), 140);
-        s1.add(new Minute(31, 12, 1, 1, 1900), 160);
-        s1.add(new Minute(36, 12, 1, 1, 1900), 180);
-        s1.add(new Minute(42, 12, 1, 1, 1900), 200);
-        s1.add(new Minute(43, 12, 1, 1, 1900), 200);
-        s1.add(new Minute(51, 12, 1, 1, 1900), 220);
+    private static XYDataset createDataset(File xmlfile) {
         
-        TimeSeries s2 = new TimeSeries("1Y17");
-        s2.add(new Minute(9, 12, 1, 1, 1900), 0);
-        s2.add(new Minute(25, 12, 1, 1, 1900), 80);
-        s2.add(new Minute(26, 12, 1, 1, 1900), 80);
-        s2.add(new Minute(41, 12, 1, 1, 1900), 120);
-        s2.add(new Minute(42, 12, 1, 1, 1900), 120);
-        s2.add(new Minute(56, 12, 1, 1, 1900), 200);
-        s2.add(new Minute(57, 12, 1, 1, 1900), 200);
-        s2.add(new Minute(04, 13, 1, 1, 1900), 220);
+        String[] stations = getStations(xmlfile);
+        System.out.println(Arrays.toString(stations));
+        NodeList servicesNodeList = getServices(xmlfile);
+        ArrayList<TimeSeries> timeSeriesList = new ArrayList<>();
+        
+        for(int i = 0; i < servicesNodeList.getLength(); i++) {
+            Node serviceNode = servicesNodeList.item(i);
+            Element serviceElement = (Element) serviceNode;
+            TimeSeries temp = new TimeSeries(serviceElement.getAttribute("id"));
+            NodeList stopNodeList = serviceElement.getChildNodes();
+            for(int j = 0; j < stopNodeList.getLength(); j++) {
+                Node stopNode = stopNodeList.item(j);
+                Element stopElement = (Element) stopNode;
+                if(stopElement.getElementsByTagName("arrtime") != null) {
+                    String time = stopElement.getElementsByTagName("arrtime").item(0).getTextContent();
+                    String station = stopElement.getElementsByTagName("station").item(0).getTextContent();
+                    int stationNumber = findIndexOfStringArray(stations, station) * 20;
+                    String[] timeSplit = time.split(":");
+                    temp.add(new Minute(Integer.parseInt(timeSplit[1]), Integer.parseInt(timeSplit[0]), 1, 1, 1900), stationNumber);
+                }
+                if(stopElement.getElementsByTagName("deptime") != null) {
+                    String time = stopElement.getElementsByTagName("deptime").item(0).getTextContent();
+                    String station = stopElement.getElementsByTagName("station").item(0).getTextContent();
+                    int stationNumber = findIndexOfStringArray(stations, station) * 20;
+                    String[] timeSplit = time.split(":");
+                    temp.add(new Minute(Integer.parseInt(timeSplit[1]), Integer.parseInt(timeSplit[0]), 1, 1, 1900), stationNumber);
+                }
+            }
+            timeSeriesList.add(temp);
+        }
+        
+        TimeSeriesCollection stationDataset = new TimeSeriesCollection();
+        for(int i = 0; i < timeSeriesList.size(); i++) {
+            stationDataset.addSeries(timeSeriesList.get(i));
+        }
 
-        TimeSeriesCollection dataset = new TimeSeriesCollection();
-        dataset.addSeries(s1);
-        dataset.addSeries(s2);
-
-        return dataset;
+        return stationDataset;
 
     }
     
-    public static JPanel createDemoPanel() {
-        JFreeChart chart = createChart(createDataset());
+    public static JPanel createDemoPanel(File xmlfile) {
+        JFreeChart chart = createChart(createDataset(xmlfile));
         ChartPanel panel = new ChartPanel(chart, false);
         panel.setFillZoomRectangle(true);
         panel.setMouseWheelEnabled(true);
         return panel;
+    }
+    
+    public static String[] getStations(File xmlfile) {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = null;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(GraphGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Document doc = null;
+        try {
+            doc = dBuilder.parse(xmlfile);
+        } catch (SAXException | IOException ex) {
+            Logger.getLogger(GraphGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        doc.getDocumentElement().normalize();
+
+        NodeList stationsNodeList = doc.getChildNodes();
+
+        ArrayList<String> stationArrayList = new ArrayList<>();
+
+        for (int i = 0; i < stationsNodeList.getLength(); i++) {
+            Node stationNode = stationsNodeList.item(i);
+            if(stationNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element stationElement = (Element) stationNode;
+                stationArrayList.add(stationElement.getAttribute("name"));
+            }
+        }
+
+        return stationArrayList.toArray(new String[stationArrayList.size()]);
+    }
+    
+    public static NodeList getServices(File xmlfile) {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = null;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(GraphGenerator.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            Document doc = dBuilder.parse(xmlfile);
+            doc.getDocumentElement().normalize();
+            return doc.getElementsByTagName("service");
+        } catch (SAXException | IOException ex) {
+            Logger.getLogger(GraphGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    public static int findIndexOfStringArray(String[] array, String item) {
+        for(int i = 0; i < array.length; i++) {
+            if(array[i].equals(item)) {
+                return i;
+            }
+        }
     }
 }
