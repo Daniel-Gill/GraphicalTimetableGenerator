@@ -1,21 +1,90 @@
 STATIONS
-6
+12
 Sheffield
 Meadowhall Interchange
 Chapeltown
 Elsecar
 Wombwell
 Barnsley
+Darton
+Wakefield Kirkgate
+Normanton
+Castleford
+Woodlesford
+Leeds
 ;
 SERVICES
-2
+8
 1A00
-Sheffield d06:00
-Meadowhall Interchange a06:05 d06:06
-Barnsley a06:21
+Sheffield d08:35
+Meadowhall Interchange d08:41
+Chapeltown d08:47
+Elsecar d08:53
+Wombwell d08:56
+Barnsley a09:03
 ;
 2B00
-Sheffield d06:05
-Meadowhall Interchange a06:10 d06:11
-Chapeltown a06:16
+Sheffield d08:45
+Meadowhall Interchange d08:51
+Barnsley d09:09
+Wakefield Kirkgate d09:25
+Leeds a09:45
+;
+1B00
+Sheffield d09:03
+Meadowhall Interchange d09:08
+Chapeltown d09:15
+Elsecar d09:21
+Wombwell d09:24
+Barnsley d09:31
+Darton d09:36
+Wakefield Kirkgate d09:49
+Normanton a09:54
+Castleford a09:59
+Woodlesford a10:11
+Leeds a10:25
+;
+2B02
+Sheffield d09:18
+Meadowhall Interchange d09:24
+Barnsley d09:40
+Wakefield Kirkgate d09:55
+Leeds a10:15
+;
+1A02
+Sheffield d09:35
+Meadowhall Interchange d09:41
+Chapeltown d09:47
+Elsecar d09:53
+Wombwell d09:56
+Barnsley a10:03
+;
+1B01
+Leeds a08:30
+Woodlesford d08:39
+Castleford d08:50
+Normanton d08:56
+Wakefield Kirkgate d09:01
+Darton d09:13
+Barnsley d09:21
+Wombwell d09:26
+Elsecar d09:30
+Chapeltown d09:36
+Meadowhall Interchange d09:42
+Sheffield a09:51
+;
+2B01
+Leeds d09:08
+Wakefield Kirkgate d09:25
+Barnsley d09:41
+Meadowhall Interchange d09:57
+Sheffield a10:04
+;
+1A01
+Barnsley a10:00
+Wombwell d10:05
+Elsecar d10:09
+Chapeltown d10:15
+Meadowhall Interchange d10:21
+Sheffield a10:28
 ;
